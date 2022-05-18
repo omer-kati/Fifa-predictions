@@ -1,1 +1,6 @@
 /venv/
+/tmp/
+/temp/
+/.idea
+/totals/source.csv
+/totals/target.csv

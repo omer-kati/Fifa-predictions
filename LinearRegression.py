@@ -1,15 +1,11 @@
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
 from sklearn.metrics import mean_squared_error, r2_score,mean_absolute_error,mean_absolute_percentage_error
-import matplotlib.pyplot as plt
-import numpy as np
 
 
-scaler = MinMaxScaler()
-x_data = pd.read_csv("source.csv")
-y_data = pd.read_csv("target.csv").drop(columns=["sofifa_id"])
+x_data = pd.read_csv("newSourceMarketValue.csv").drop(columns=["short_name", "player_positions"])
+y_data = pd.read_csv("newTargetMarketValue.csv")
 y_data = y_data.to_numpy()
 
 x_train, x_test, y_train, y_test = train_test_split( x_data, y_data, test_size=0.1, random_state=42)

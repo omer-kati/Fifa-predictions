@@ -13,6 +13,15 @@ data18 = pd.read_csv("players_18.csv").sort_values(by="sofifa_id")
 data19 = pd.read_csv("players_19.csv").sort_values(by="sofifa_id")
 data20 = pd.read_csv("players_20.csv").sort_values(by="sofifa_id")
 data21 = pd.read_csv("players_21.csv").sort_values(by="sofifa_id")
+
+data15["data_year"] = 2015
+data16["data_year"] = 2016
+data17["data_year"] = 2017
+data18["data_year"] = 2018
+data19["data_year"] = 2019
+data20["data_year"] = 2020
+data21["data_year"] = 2021
+
 dataList = [data21, data20, data19, data18, data17, data16, data15]
 dataNames = ["data15", "data16", "data17", "data18", "data19", "data20", "data21"]
 
@@ -55,9 +64,10 @@ cleanList = []
 for d in dataList:
     dataNoDuplicate = d
     dataNoDuplicate = dataNoDuplicate.iloc[:, :80]
+    dataNoDuplicate["data_year"] = d["data_year"]
     dataNoDuplicate = dataNoDuplicate.drop(columns=[
         'player_url',
-        'sofifa_id',
+        'short_name',
         'long_name',
         'dob',
         'real_face',
@@ -89,37 +99,32 @@ for d in dataList:
         'defending',
         'physic',
         'contract_valid_until',
-        'team_jersey_number'
+        'team_jersey_number',
+        # "player_positions"
     ])
     dataNoDuplicate = dataNoDuplicate.dropna(axis=0, how='any')
-    # print(filter_position(dataNoDuplicate["player_positions"]))
-    # dataNoDuplicate["player_positions"] = filter_position(dataNoDuplicate["player_positions"])
-    # dataNoDuplicate['player_positions'] = dataNoDuplicate['player_positions'].astype('category').cat.codes
     dataNoDuplicate['nationality'] = dataNoDuplicate['nationality'].astype('category').cat.codes
     dataNoDuplicate['club_name'] = dataNoDuplicate['club_name'].astype('category').cat.codes
     dataNoDuplicate['league_name'] = dataNoDuplicate['league_name'].astype('category').cat.codes
-    # dataNoDuplicate['player_positions'] = dataNoDuplicate['player_positions'].astype('category').cat.codes
     dataNoDuplicate['preferred_foot'] = dataNoDuplicate['preferred_foot'].astype('category').cat.codes
     dataNoDuplicate['team_position'] = dataNoDuplicate['team_position'].astype('category').cat.codes
     dataNoDuplicate['work_rate'] = dataNoDuplicate['team_position'].astype('category').cat.codes
 
     dataNoDuplicate['league_rank'] = dataNoDuplicate['league_rank'].astype('int32')
-    dataNoDuplicate = dataNoDuplicate.sort_values(by="short_name")
+    dataNoDuplicate = dataNoDuplicate.sort_values(by="sofifa_id")
 
     cleanList.append(dataNoDuplicate)
 
 df_all = pd.concat(cleanList, join="inner")
 
-df_all = df_all[df_all.groupby('short_name')["short_name"].transform('count') == 3].copy()
+df_all = df_all[df_all.groupby('sofifa_id')["sofifa_id"].transform('count') >= 3].copy()
 
-print(df_all.head())
 df_positions = filter_position(df_all["player_positions"].values)
 
 for col in df_positions.keys():
     df_all[col] = df_positions[col]
 
-print(df_all.head())
+print(cleanList)
+df_all = df_all.drop(columns=["player_positions"])
 
-
-df_all.to_csv("allPlayersCleaned.csv", index=False)
-# df_target.to_csv("target.csv", index= False)
+df_all.to_csv("allPlayers.csv", index=False)
